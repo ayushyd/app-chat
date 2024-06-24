@@ -1,0 +1,29 @@
+<div id ="messages"></div>
+<input type = "text" id= "message">
+<button id = "send">Send</button>
+
+<%if current_user.present?%>
+<%=current_user.email%>
+<%=button_to "signout", destroy_user_session_path, method: :delete, data: {confirm: "Are you want to sure?"}%>
+<%else%>
+<%=link_to "signin", new_user_session_path%>
+<%end%>
+
+<%=link_to "Articles", artices_path%>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const chatChannel = consumer.subscriptions.create("ChatChannel", {
+      received(data) {
+        const messages = document.querySelector('#messages')
+        messages.insertAdjacentHTML('beforeend', `<p>${data.message}</p>`)
+      }
+    })
+
+    document.querySelector('#send').addEventListener('click', () => {
+      const input = document.querySelector('#message')
+      chatChannel.speak(input.value)
+      input.value = ''
+    })
+  })
+</script>
